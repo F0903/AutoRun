@@ -1,7 +1,6 @@
 module;
 #include <Windows.h>
 #include <map>
-#include <functional>
 export module Keyboard;
 
 export enum class Key
@@ -21,12 +20,17 @@ export struct Hotkey
 	bool holdShift;
 	Key key;
 	Key shortKey; // Key for shorting out.
-	std::function<void()> onCombo;
-	std::function<void()> onShort;
+	void(*onCombo)();
+	void(*onShort)();
 };
 
 struct KeyInfo
 {
+	KeyInfo() = default;
+
+	KeyInfo(WORD code) : code(code), scancode(MapVirtualKey(code, MAPVK_VK_TO_VSC))
+	{}
+
 	WORD code;
 	UINT scancode;
 };
@@ -34,11 +38,11 @@ struct KeyInfo
 export class Keyboard
 {
 	static inline std::map<Key, KeyInfo> keys = {
-		{Key::W, { 0x57, MapVirtualKey(0x57, MAPVK_VK_TO_VSC)}},
-		{Key::A, { 0x41, MapVirtualKey(0x41, MAPVK_VK_TO_VSC)}},
-		{Key::S, { 0x53, MapVirtualKey(0x53, MAPVK_VK_TO_VSC)}},
-		{Key::D, { 0x44, MapVirtualKey(0x44, MAPVK_VK_TO_VSC)}},
-		{Key::Space, {VK_SPACE, MapVirtualKey(VK_SPACE, MAPVK_VK_TO_VSC) }}
+		{Key::W, KeyInfo(0x57) },
+		{Key::A, KeyInfo(0x41) },
+		{Key::S, KeyInfo(0x53) },
+		{Key::D, KeyInfo(0x44) },
+		{Key::Space, KeyInfo(VK_SPACE) }
 	};
 
 	static inline std::map<int, Hotkey> hotkeys;
