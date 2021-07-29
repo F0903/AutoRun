@@ -1,40 +1,54 @@
 #include <iostream>
+#include <vector>
 import Keyboard;
+import CommandHandler;
+import Console;
 
 auto kbd = Keyboard();
+auto cmd = CommandHandler();
 
-void OnHotkey(unsigned int hotkeyId)
+void OnRun()
 {
-	if (hotkeyId != 0)
-		return;
-
 	if (kbd.GetState(Key::W) == KeyState::Released)
 	{
 		kbd.Press(Key::W);
 		kbd.GetState(Key::W);
-		std::cout << "Press" << std::endl;
+		Console::WriteLine("Press");
 	}
 	else
 	{
 		kbd.Release(Key::W);
 		kbd.GetState(Key::W);
-		std::cout << "Release" << std::endl;
+		Console::WriteLine("Release");
 	}
 }
 
 int main()
 {
-	std::cout << "Setting up hotkeys..." << std::endl;
+	cmd.Handle("sprint", [](const std::vector<Argument>& args)
+	{
+		auto& first = args[0];
+		if (StrEquals(first.chars, "enable"))
+		{
+			Console::WriteLine("Sprint is now enabled...");
+		}
+		if (StrEquals(first.chars, "disable"))
+		{
+			Console::WriteLine("Sprint is now disabled...");
+		}
+	});
+	Console::WriteLine("Setting up hotkeys...");
 	Hotkey key = {
 		0,
 		true,
 		false,
 		true,
 		Key::A,
-		OnHotkey,
+		OnRun,
 	};
 	kbd.RegisterHotkey(key);
-	std::cout << "Done!" << std::endl;
+	kbd.ListenForInput();
+	Console::WriteLine("Done!");
 	while (true)
 	{
 		kbd.PollHotkey();

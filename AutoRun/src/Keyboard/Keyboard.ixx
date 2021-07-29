@@ -9,15 +9,26 @@ export class Keyboard
 	static inline std::map<unsigned int, Hotkey> hotkeys;
 
 	bool ignoreNext = false;
+	bool pollWaitMode = true;
 
 	private:
-	void IgnoreNext()
+	void IgnoreNext() noexcept
 	{
 		ignoreNext = true;
 	}
 
 	public:
-	KeyState GetState(Key key)
+	void SetPollingWait(bool wait) noexcept
+	{
+		pollWaitMode = wait;
+	}
+
+	bool GetPollingWait() const noexcept
+	{
+		return pollWaitMode;
+	}
+
+	KeyState GetState(Key key) const noexcept
 	{
 		const auto& info = GetKeyInfo(key);
 		const auto state = GetKeyState(info.code);
@@ -26,7 +37,7 @@ export class Keyboard
 		return highBit ? KeyState::Pressed : KeyState::Released;
 	}
 
-	void Tap(Key key)
+	void Tap(Key key) const
 	{
 		const auto& keyInfo = GetKeyInfo(key);
 
@@ -55,7 +66,7 @@ export class Keyboard
 			throw;
 	}
 
-	void Press(Key key)
+	void Press(Key key) const
 	{
 		const auto& info = GetKeyInfo(key);
 
@@ -74,7 +85,7 @@ export class Keyboard
 			throw;
 	}
 
-	void Release(Key key)
+	void Release(Key key) const
 	{
 		const auto& info = GetKeyInfo(key);
 
@@ -111,21 +122,22 @@ export class Keyboard
 		hotkeys[hotkey.id] = hotkey;
 	}
 
-	void UnregisterHotkey(const Hotkey& hotkey)
+	void UnregisterHotkey(const Hotkey& hotkey) noexcept
 	{
 		UnregisterHotkey(hotkey.id);
 	}
 
-	void UnregisterHotkey(int hotkeyId)
+	void UnregisterHotkey(const int hotkeyId) noexcept
 	{
 		UnregisterHotKey(NULL, hotkeyId);
+		hotkeys.erase(hotkeys.find(hotkeyId));
 	}
 
 	void PollHotkey()
 	{
 		MSG msg = { 0 };
 		BOOL res;
-		while ((res = GetMessage(&msg, NULL, 0, 0)) != 0)
+		while ((res = pollWaitMode ? GetMessage(&msg, NULL, 0, 0) : PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) != 0)
 		{
 			if (res == -1) throw;
 			if (msg.message != WM_HOTKEY)
@@ -137,7 +149,7 @@ export class Keyboard
 			}
 			const unsigned int id = msg.wParam;
 			const auto& hotkey = hotkeys[id];
-			if (hotkey.onHotkey) hotkey.onHotkey(id);
+			if (hotkey.onHotkey) hotkey.onHotkey();
 			break;
 		}
 	}

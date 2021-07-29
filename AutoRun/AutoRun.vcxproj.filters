@@ -4,5 +4,7 @@
     <ClCompile Include="src\Keyboard\Keyboard.ixx" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Keyboard\Key.ixx" />
+    <ClCompile Include="src\CommandHandler.ixx" />
+    <ClCompile Include="src\Console.ixx" />
   </ItemGroup>
 </Project>

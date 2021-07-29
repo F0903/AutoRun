@@ -143,6 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CommandHandler.ixx" />
+    <ClCompile Include="src\Console.ixx" />
     <ClCompile Include="src\Keyboard\Key.ixx" />
     <ClCompile Include="src\Keyboard\Keyboard.ixx" />
     <ClCompile Include="src\main.cpp" />
