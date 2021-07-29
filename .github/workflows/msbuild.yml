@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     env:
-     OUT_PATH: ./${{BUILD_PLATFORM}}/${{BUILD_CONFIGURATION}}/
+     OUT_PATH: ./${{env.BUILD_PLATFORM}}/${{env.BUILD_CONFIGURATION}}/
   
     runs-on: windows-latest
 
