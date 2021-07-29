@@ -1,5 +1,6 @@
 # AutoRun
 [![MSBuild](https://github.com/F0903/AutoRun/actions/workflows/msbuild.yml/badge.svg)](https://github.com/F0903/AutoRun/actions/workflows/msbuild.yml)
+
 A small program that lets you auto run in any game.
 
 To start, simply launch the app. A console window will pop up, which you can minimize if you wish.
