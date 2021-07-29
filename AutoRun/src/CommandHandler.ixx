@@ -64,6 +64,11 @@ export class CommandHandler
 					words[wordCount].chars[i] = ch;
 					++i;
 				}
+				if (i < 1)
+				{
+					words.pop_back();
+					break;
+				}
 				word.length = i;
 				++wordCount;
 			}
@@ -73,6 +78,7 @@ export class CommandHandler
 		}
 		for (const auto& handler : handlers)
 		{
+			if (words.empty()) break;
 			auto& word = words[0];
 			const char* handlerName = handler.first;
 			if (StrEquals(word.chars, handlerName))

@@ -10,7 +10,8 @@ export enum class Key
 	A,
 	S,
 	D,
-	Space
+	Space,
+	Shift
 };
 
 export enum class KeyState
@@ -45,7 +46,8 @@ static inline std::map<Key, KeyInfo> keys = {
 	{ Key::A, KeyInfo(0x41) },
 	{ Key::S, KeyInfo(0x53) },
 	{ Key::D, KeyInfo(0x44) },
-	{ Key::Space, KeyInfo(VK_SPACE) }
+	{ Key::Space, KeyInfo(VK_SPACE) },
+	{ Key::Shift, KeyInfo(VK_LSHIFT) }
 };
 
 export const KeyInfo& GetKeyInfo(Key key)
