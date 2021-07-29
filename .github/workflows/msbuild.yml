@@ -12,10 +12,11 @@ env:
   BUILD_CONFIGURATION: Release
   BUILD_PLATFORM: x64
   
-  OUT_PATH: ./${{BUILD_PLATFORM}}/${{BUILD_CONFIGURATION}}/
-  
 jobs:
   build:
+    env:
+     OUT_PATH: ./${{BUILD_PLATFORM}}/${{BUILD_CONFIGURATION}}/
+  
     runs-on: windows-latest
 
     steps:
