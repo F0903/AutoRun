@@ -8,27 +8,27 @@ export class Keyboard
 {
 	static inline std::map<unsigned int, Hotkey> hotkeys;
 
-	bool ignoreNext = false;
-	bool pollWaitMode = true;
+	static inline bool ignoreNext = false;
+	static inline bool pollWaitMode = true;
 
 	private:
-	void IgnoreNext() noexcept
+	static void IgnoreNext() noexcept
 	{
 		ignoreNext = true;
 	}
 
 	public:
-	void SetPollingWait(bool wait) noexcept
+	static void SetPollingWait(bool wait) noexcept
 	{
 		pollWaitMode = wait;
 	}
 
-	bool GetPollingWait() const noexcept
+	static bool GetPollingWait() noexcept
 	{
 		return pollWaitMode;
 	}
 
-	KeyState GetState(Key key) const noexcept
+	static KeyState GetState(Key key) noexcept
 	{
 		const auto& info = GetKeyInfo(key);
 		const auto state = GetKeyState(info.code);
@@ -37,7 +37,7 @@ export class Keyboard
 		return highBit ? KeyState::Pressed : KeyState::Released;
 	}
 
-	void Tap(Key key) const
+	static void Tap(Key key)
 	{
 		const auto& keyInfo = GetKeyInfo(key);
 
@@ -66,7 +66,7 @@ export class Keyboard
 			throw;
 	}
 
-	void Press(Key key) const
+	static void Press(Key key)
 	{
 		const auto& info = GetKeyInfo(key);
 
@@ -85,7 +85,7 @@ export class Keyboard
 			throw;
 	}
 
-	void Release(Key key) const
+	static void Release(Key key)
 	{
 		const auto& info = GetKeyInfo(key);
 
@@ -104,7 +104,7 @@ export class Keyboard
 			throw;
 	}
 
-	void RegisterHotkey(Hotkey& hotkey)
+	static void RegisterHotkey(Hotkey& hotkey)
 	{
 		if (!hotkey.onHotkey)
 			throw "Hotkey handler is required.";
@@ -112,7 +112,6 @@ export class Keyboard
 		UINT mod = MOD_NOREPEAT;
 		if (hotkey.holdAlt) mod |= MOD_ALT;
 		if (hotkey.holdCtrl) mod |= MOD_CONTROL;
-		if (hotkey.holdShift) mod |= MOD_SHIFT;
 
 		const auto& info = GetKeyInfo(hotkey.key);
 
@@ -122,18 +121,18 @@ export class Keyboard
 		hotkeys[hotkey.id] = hotkey;
 	}
 
-	void UnregisterHotkey(const Hotkey& hotkey) noexcept
+	static void UnregisterHotkey(const Hotkey& hotkey) noexcept
 	{
 		UnregisterHotkey(hotkey.id);
 	}
 
-	void UnregisterHotkey(const int hotkeyId) noexcept
+	static void UnregisterHotkey(const int hotkeyId) noexcept
 	{
 		UnregisterHotKey(NULL, hotkeyId);
 		hotkeys.erase(hotkeys.find(hotkeyId));
 	}
 
-	void PollHotkey()
+	static void PollHotkey()
 	{
 		MSG msg = { 0 };
 		BOOL res;

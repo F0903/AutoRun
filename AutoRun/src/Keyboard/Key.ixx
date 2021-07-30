@@ -25,7 +25,6 @@ export struct Hotkey
 	unsigned int id;
 	bool holdAlt;
 	bool holdCtrl;
-	bool holdShift;
 	Key key;
 	void(*onHotkey)();
 };

@@ -4,22 +4,21 @@ import Keyboard;
 import CommandHandler;
 import Console;
 
-auto kbd = Keyboard();
 auto cmd = CommandHandler();
 bool sprint = false;
 
 void OnRun()
 {
-	if (kbd.GetState(Key::W) == KeyState::Released)
+	if (Keyboard::GetState(Key::W) == KeyState::Released)
 	{
-		if (sprint) kbd.Press(Key::Shift);
-		kbd.Press(Key::W);
+		if (sprint) Keyboard::Press(Key::Shift);
+		Keyboard::Press(Key::W);
 		Console::WriteLine("Press");
 	}
 	else
 	{
-		if (sprint) kbd.Release(Key::Shift);
-		kbd.Release(Key::W);
+		if (sprint) Keyboard::Release(Key::Shift);
+		Keyboard::Release(Key::W);
 		Console::WriteLine("Release");
 	}
 }
@@ -56,21 +55,20 @@ int main()
 	Hotkey key = {
 		0,
 		true,
-		false,
 		true,
 		Key::A,
 		OnRun,
 	};
-	kbd.RegisterHotkey(key);
+	Keyboard::RegisterHotkey(key);
 
-	Console::ThreadListen([](const char* inp)
+	Console::ListenForInput([](const char* inp)
 	{
 		cmd.Parse(inp);
 	});
 
-	Console::WriteLine("Started!\nType 'help' for commands.");
+	Console::WriteLine("Started!\nType 'help' for commands.\n");
 	while (true)
 	{
-		kbd.PollHotkey();
+		Keyboard::PollHotkey();
 	}
 }

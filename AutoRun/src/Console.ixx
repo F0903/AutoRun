@@ -1,7 +1,9 @@
 module;
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <thread>
+#include <conio.h>
 export module Console;
 
 struct ConsoleAction
@@ -14,10 +16,25 @@ export class Console
 {
 	static inline bool blocked = false;
 	static inline std::vector<ConsoleAction> blockedQueue;
-	static inline bool threadListen = false;
+	static inline bool listening = false;
 	static inline std::thread listener;
 
 	private:
+	static void InternalWrite(const char* text) noexcept
+	{
+		std::cout << text;
+	}
+
+	static void InternalWrite(const char ch) noexcept
+	{
+		std::cout << ch;
+	}
+
+	static void InternalWriteLine(const char* text) noexcept
+	{
+		std::cout << text << '\n';
+	}
+
 	static void Queue(ConsoleAction action) noexcept
 	{
 		blockedQueue.push_back(action);
@@ -36,28 +53,80 @@ export class Console
 				Write(i.text);
 			}
 		}
+		blockedQueue.clear();
+	}
+
+	static inline const bool IsLetter(const char ch) noexcept
+	{
+		return (ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122);
 	}
 
 	public:
-	static void ThreadListen(void(*onInput)(const char*)) noexcept
+	static void ListenForInput(void(*onInput)(const char*)) noexcept
 	{
-		if (threadListen) return;
-		threadListen = true;
+		if (listening) return;
+		listening = true;
 		listener = std::thread([onInput]()
 		{
-			while (threadListen)
+			bool lastState = false;
+			std::stack<char> input;
+			while (listening)
 			{
-				constexpr int bufSize = 256;
-				char buf[bufSize]{ 0 };
-				std::cin.getline(buf, bufSize);
-				onInput(buf);
+				if (!lastState && !input.empty())
+				{
+					Console::Block();
+					lastState = true;
+				}
+
+				char ch = _getch();
+				if (ch == '\b')
+				{
+					if (input.empty()) continue;
+					InternalWrite("\b \b");
+					input.pop();
+
+					if (input.empty())
+					{
+						Console::Unblock();
+						lastState = false;
+					}
+					continue;
+				}
+
+				if (ch == '\r')
+				{
+					input.push(0);
+					const auto size = input.size();
+					char* buf = new char[size];
+					for (int i = size - 1; i >= 0; i--)
+					{
+						buf[i] = input.top();
+						input.pop();
+					}
+					onInput(buf);
+					for (size_t i = 0; i < size; i++)
+					{
+						InternalWrite("\b \b");
+					}
+					delete[] buf;
+
+					Console::Unblock();
+					lastState = false;
+					continue;
+				}
+
+				if (ch != ' ' && !IsLetter(ch))
+					continue;
+
+				InternalWrite(ch);
+				input.push(ch);
 			}
 		});
 	}
 
-	static void StopThreadListen() noexcept
+	static void StopListening() noexcept
 	{
-		threadListen = false;
+		listening = false;
 	}
 
 	static void Write(const char* text) noexcept
@@ -67,7 +136,7 @@ export class Console
 			Queue({ false, text });
 			return;
 		}
-		std::cout << text;
+		InternalWrite(text);
 	}
 
 	static void WriteLine(const char* text) noexcept
@@ -77,7 +146,7 @@ export class Console
 			Queue({ true, text });
 			return;
 		}
-		std::cout << text << '\n';
+		InternalWriteLine(text);
 	}
 
 	static void Block() noexcept
