@@ -4,17 +4,6 @@ module;
 #include <functional>
 export module CommandHandler;
 
-export inline bool StrEquals(const char* a, const char* b) noexcept
-{
-	while (*a)
-	{
-		if (*a != *b) return false;
-		++a;
-		++b;
-	}
-	return true;
-}
-
 export struct Argument
 {
 	private:
@@ -81,7 +70,7 @@ export class CommandHandler
 			if (words.empty()) break;
 			auto& word = words[0];
 			const char* handlerName = handler.first;
-			if (StrEquals(word.chars, handlerName))
+			if (strcmp(word.chars, handlerName) == 0)
 			{
 				words.erase(words.begin());
 				handler.second(words);
